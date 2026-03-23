@@ -169,6 +169,16 @@
   background: linear-gradient(135deg, #129f8c 0%, #0f7f74 100%);
 }
 
+#lexi-popup .lexi-slow-pronounce-btn {
+  background: #fff6e3;
+  color: #775104;
+  border-color: rgba(119, 81, 4, 0.3);
+}
+
+#lexi-popup .lexi-slow-pronounce-btn:hover {
+  background: #ffe8bb;
+}
+
 #lexi-popup .lexi-action-btn:hover {
   background: #daf7f2;
   transform: translateY(-1px);

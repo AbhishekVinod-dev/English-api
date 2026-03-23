@@ -84,6 +84,7 @@ function renderPopup(info) {
       ${safeExample ? `<div class="lexi-example">"${safeExample}"</div>` : ""}
       <div class="lexi-actions">
         <button class="lexi-action-btn lexi-pronounce-btn" id="lexi-pronounce-btn" aria-label="Play pronunciation audio">Play Pronunciation</button>
+        <button class="lexi-action-btn lexi-slow-pronounce-btn" id="lexi-slow-pronounce-btn" aria-label="Play slow pronunciation audio">Slow Pronunciation</button>
         <button class="lexi-action-btn" id="lexi-speak-meaning-btn" aria-label="Read meaning aloud">Read Meaning Aloud</button>
       </div>
     </div>
@@ -96,10 +97,12 @@ function renderPopup(info) {
 
   const speakWordBtn = document.getElementById("lexi-speak-word-btn");
   const pronounceBtn = document.getElementById("lexi-pronounce-btn");
+  const slowPronounceBtn = document.getElementById("lexi-slow-pronounce-btn");
   const speakMeaningBtn = document.getElementById("lexi-speak-meaning-btn");
 
-  speakWordBtn.onclick = () => playPronunciation(info, speakWordBtn);
-  pronounceBtn.onclick = () => playPronunciation(info, pronounceBtn);
+  speakWordBtn.onclick = () => playPronunciation(info, speakWordBtn, 1);
+  pronounceBtn.onclick = () => playPronunciation(info, pronounceBtn, 1);
+  slowPronounceBtn.onclick = () => playPronunciation(info, slowPronounceBtn, 0.65);
   speakMeaningBtn.onclick = () => {
     const phrase = `${info.word}. ${info.partOfSpeech}. ${info.definition}`;
     toggleSpeech(phrase, speakMeaningBtn);
@@ -111,9 +114,9 @@ function renderPopup(info) {
   };
 }
 
-function playPronunciation(info, button) {
+function playPronunciation(info, button, speed = 1) {
   if (!info.audioUrl) {
-    toggleSpeech(info.word, button);
+    toggleSpeech(info.word, button, speed);
     return;
   }
 
@@ -138,6 +141,7 @@ function playPronunciation(info, button) {
 
   clearSpeechState();
   const audio = new Audio(info.audioUrl);
+  audio.playbackRate = speed;
   currentAudio = audio;
   button.classList.add("is-speaking");
 
@@ -156,16 +160,16 @@ function playPronunciation(info, button) {
   };
   audio.onerror = () => {
     resetAudioState();
-    toggleSpeech(info.word, button);
+    toggleSpeech(info.word, button, speed);
   };
 
   audio.play().catch(() => {
     resetAudioState();
-    toggleSpeech(info.word, button);
+    toggleSpeech(info.word, button, speed);
   });
 }
 
-function toggleSpeech(text, button) {
+function toggleSpeech(text, button, rate = 0.92) {
   if (!window.speechSynthesis) {
     console.warn("Speech synthesis is not supported in this browser.");
     return;
@@ -195,7 +199,7 @@ function toggleSpeech(text, button) {
   } else {
     utterance.lang = "en-US";
   }
-  utterance.rate = 0.92;
+  utterance.rate = rate;
   utterance.pitch = 1;
 
   utterance.onend = () => {
