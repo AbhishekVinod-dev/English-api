@@ -115,6 +115,8 @@
   margin-top: 15px;
   display: flex;
   justify-content: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 #lexi-popup .lexi-voice-btn,
@@ -155,6 +157,16 @@
   font-size: 12px;
   font-weight: 700;
   padding: 7px 11px;
+}
+
+#lexi-popup .lexi-pronounce-btn {
+  background: linear-gradient(135deg, #0e9f8d 0%, #158f7a 100%);
+  color: #ffffff;
+  border-color: rgba(10, 111, 113, 0.45);
+}
+
+#lexi-popup .lexi-pronounce-btn:hover {
+  background: linear-gradient(135deg, #129f8c 0%, #0f7f74 100%);
 }
 
 #lexi-popup .lexi-action-btn:hover {

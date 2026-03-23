@@ -1,4 +1,5 @@
 let currentUtterance = null;
+let currentAudio = null;
 
 document.addEventListener("mouseup", (event) => {
   const selection = window.getSelection().toString().trim();
@@ -9,6 +10,7 @@ document.addEventListener("mouseup", (event) => {
   }
   
   if (existing && !existing.contains(event.target)) {
+    stopAllPlayback();
     existing.remove();
   }
 
@@ -26,10 +28,14 @@ async function fetchDefinition(word, x, y) {
 
     const entry = data[0];
     const meaning = entry.meanings[0];
+    const audioUrl =
+      (entry.phonetics || []).find((item) => item && typeof item.audio === "string" && item.audio.trim())
+        ?.audio || "";
     
     renderPopup({
       word: entry.word,
       phonetic: entry.phonetic || "",
+      audioUrl,
       partOfSpeech: meaning.partOfSpeech,
       definition: meaning.definitions[0].definition,
       example: meaning.definitions[0].example || "",
@@ -42,8 +48,8 @@ async function fetchDefinition(word, x, y) {
 }
 
 function renderPopup(info) {
+  stopAllPlayback();
   if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
     // Ensure voice list is initialized in browsers that lazy-load voices.
     window.speechSynthesis.getVoices();
   }
@@ -77,6 +83,7 @@ function renderPopup(info) {
       <p class="lexi-definition">${safeDefinition}</p>
       ${safeExample ? `<div class="lexi-example">"${safeExample}"</div>` : ""}
       <div class="lexi-actions">
+        <button class="lexi-action-btn lexi-pronounce-btn" id="lexi-pronounce-btn" aria-label="Play pronunciation audio">Play Pronunciation</button>
         <button class="lexi-action-btn" id="lexi-speak-meaning-btn" aria-label="Read meaning aloud">Read Meaning Aloud</button>
       </div>
     </div>
@@ -88,21 +95,86 @@ function renderPopup(info) {
   popup.addEventListener("click", (event) => event.stopPropagation());
 
   const speakWordBtn = document.getElementById("lexi-speak-word-btn");
+  const pronounceBtn = document.getElementById("lexi-pronounce-btn");
   const speakMeaningBtn = document.getElementById("lexi-speak-meaning-btn");
 
-  speakWordBtn.onclick = () => toggleSpeech(info.word, speakWordBtn);
+  speakWordBtn.onclick = () => playPronunciation(info, speakWordBtn);
+  pronounceBtn.onclick = () => playPronunciation(info, pronounceBtn);
   speakMeaningBtn.onclick = () => {
     const phrase = `${info.word}. ${info.partOfSpeech}. ${info.definition}`;
     toggleSpeech(phrase, speakMeaningBtn);
   };
 
-  document.getElementById("lexi-close-btn").onclick = () => popup.remove();
+  document.getElementById("lexi-close-btn").onclick = () => {
+    stopAllPlayback();
+    popup.remove();
+  };
+}
+
+function playPronunciation(info, button) {
+  if (!info.audioUrl) {
+    toggleSpeech(info.word, button);
+    return;
+  }
+
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    currentUtterance = null;
+  }
+
+  if (currentAudio && currentAudio.src === info.audioUrl && !currentAudio.paused) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+    clearSpeechState();
+    return;
+  }
+
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
+  clearSpeechState();
+  const audio = new Audio(info.audioUrl);
+  currentAudio = audio;
+  button.classList.add("is-speaking");
+
+  const resetAudioState = () => {
+    if (currentAudio === audio) {
+      currentAudio = null;
+    }
+    clearSpeechState();
+  };
+
+  audio.onended = resetAudioState;
+  audio.onpause = () => {
+    if (audio.currentTime === 0 || audio.ended) {
+      resetAudioState();
+    }
+  };
+  audio.onerror = () => {
+    resetAudioState();
+    toggleSpeech(info.word, button);
+  };
+
+  audio.play().catch(() => {
+    resetAudioState();
+    toggleSpeech(info.word, button);
+  });
 }
 
 function toggleSpeech(text, button) {
   if (!window.speechSynthesis) {
     console.warn("Speech synthesis is not supported in this browser.");
     return;
+  }
+
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
   }
 
   if (currentUtterance && button.classList.contains("is-speaking")) {
@@ -139,6 +211,21 @@ function toggleSpeech(text, button) {
   currentUtterance = utterance;
   button.classList.add("is-speaking");
   window.speechSynthesis.speak(utterance);
+}
+
+function stopAllPlayback() {
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+  currentUtterance = null;
+
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
+  clearSpeechState();
 }
 
 function clearSpeechState() {
