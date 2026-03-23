@@ -1,0 +1,200 @@
+:root {
+  --lexi-ink: #1a1f36;
+  --lexi-muted: #5c647e;
+  --lexi-shell: #f9fbff;
+  --lexi-accent: #0e9f8d;
+  --lexi-accent-deep: #0a6f71;
+  --lexi-glow: #ffc95e;
+}
+
+#lexi-popup {
+  position: fixed;
+  padding: 0;
+  width: min(92vw, 330px);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.94) 0%, rgba(246, 251, 255, 0.96) 100%);
+  border: 1px solid rgba(14, 111, 113, 0.2);
+  box-shadow: 0 20px 45px rgba(14, 111, 113, 0.2), 0 2px 8px rgba(26, 31, 54, 0.12);
+  border-radius: 18px;
+  z-index: 2147483647;
+  font-family: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
+  overflow: hidden;
+  transform-origin: top left;
+  animation: lexi-pop 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes lexi-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.lexi-header {
+  background:
+    radial-gradient(circle at 85% 10%, rgba(255, 201, 94, 0.26) 0%, transparent 38%),
+    linear-gradient(120deg, #0a6f71 0%, #0e9f8d 55%, #1ca47e 100%);
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.lexi-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.lexi-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lexi-body {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(249, 251, 255, 0.96) 100%),
+    var(--lexi-shell);
+  padding: 18px;
+  color: var(--lexi-ink);
+}
+
+.lexi-phonetic {
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 12px;
+  color: var(--lexi-accent-deep);
+  margin-bottom: 8px;
+}
+
+.lexi-type {
+  display: inline-block;
+  border: 1px solid rgba(14, 111, 113, 0.2);
+  background: rgba(14, 159, 141, 0.08);
+  color: var(--lexi-accent-deep);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.lexi-definition {
+  font-size: 15px;
+  line-height: 1.55;
+  margin: 0;
+  color: var(--lexi-ink);
+}
+
+.lexi-example {
+  margin-top: 12px;
+  padding-left: 11px;
+  border-left: 3px solid rgba(14, 111, 113, 0.25);
+  color: var(--lexi-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  font-style: italic;
+}
+
+.lexi-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+#lexi-popup .lexi-voice-btn,
+#lexi-popup .lexi-action-btn,
+#lexi-popup .lexi-close {
+  border: none;
+  cursor: pointer;
+  transition: transform 140ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center;
+  justify-content: center;
+}
+
+#lexi-popup .lexi-voice-btn {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 7px;
+  min-width: 68px;
+}
+
+#lexi-popup .lexi-voice-btn:hover {
+  background: rgba(255, 255, 255, 0.34);
+  transform: translateY(-1px);
+}
+
+#lexi-popup .lexi-action-btn {
+  background: #f0fcfa;
+  color: var(--lexi-accent-deep);
+  border: 1px solid rgba(14, 111, 113, 0.22);
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 11px;
+}
+
+#lexi-popup .lexi-action-btn:hover {
+  background: #daf7f2;
+  transform: translateY(-1px);
+}
+
+#lexi-popup .lexi-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+#lexi-popup .lexi-close:hover {
+  background: rgba(255, 255, 255, 0.36);
+}
+
+#lexi-popup .lexi-voice-btn.is-speaking,
+#lexi-popup .lexi-action-btn.is-speaking {
+  background: var(--lexi-glow);
+  color: #513600;
+  box-shadow: 0 0 0 3px rgba(255, 201, 94, 0.28);
+}
+
+@media (max-width: 480px) {
+  #lexi-popup {
+    width: min(94vw, 330px);
+  }
+
+  .lexi-header h1 {
+    max-width: 150px;
+    font-size: 18px;
+  }
+
+  .lexi-body {
+    padding: 16px;
+  }
+}
+
